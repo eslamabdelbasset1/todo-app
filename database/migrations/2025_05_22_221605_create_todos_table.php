@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('due_date')->nullable();
             $table->boolean('completed')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

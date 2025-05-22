@@ -12,7 +12,7 @@ class TodoController extends Controller
      */
     public function index()
     {
-        $todos = Todo::latest()->get();
+        $todos = auth()->user()->todos()->latest()->get();
         return view('todos.index', compact('todos'));
     }
 
@@ -29,13 +29,13 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|max:255',
-            'description' => 'nullable',
+            'description' => 'nullable|string',
             'due_date' => 'nullable|date',
         ]);
 
-        Todo::create($request->all());
+        auth()->user()->todos()->create($validated);
 
         return redirect()->route('todos.index')
             ->with('success', 'Todo created successfully.');
@@ -54,6 +54,10 @@ class TodoController extends Controller
      */
     public function edit(Todo $todo)
     {
+        if ($todo->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         return view('todos.edit', compact('todo'));
     }
 
@@ -62,6 +66,10 @@ class TodoController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
+        if ($todo->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         $request->validate([
             'title' => 'required|max:255',
             'description' => 'nullable',
@@ -79,6 +87,10 @@ class TodoController extends Controller
      */
     public function destroy(Todo $todo)
     {
+        if ($todo->user_id !== auth()->id()) {
+            abort(403);
+        }
+
         $todo->delete();
 
         return redirect()->route('todos.index')

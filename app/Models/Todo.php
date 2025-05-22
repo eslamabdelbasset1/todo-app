@@ -9,5 +9,11 @@ class Todo extends Model
 {
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $fillable = ['title', 'description', 'due_date', 'completed'];
+
+    protected $dates = ['due_date'];
+    protected $casts = [
+        'due_date' => 'datetime',
+        'completed' => 'boolean'
+    ];
 }
